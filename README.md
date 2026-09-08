@@ -1,2 +1,2 @@
 # Agent_DS
-An AI agent that analyzes datasets, generates insights, critiques its own output, and remembers what worked — improving its analysis strategy over time.
+An AI agent that analyzes datasets, generates insights, learns from feedback, and improved its insight quality score by X% over Y runs.
