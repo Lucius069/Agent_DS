@@ -1,39 +1,148 @@
-# Self-Learning Data Analysis Agent
+## 🧠 Self-Learning Data Analysis Agent
 
-An AI agent that analyzes datasets, generates insights, critiques its own output,
-and remembers what worked — improving its analysis strategy over time.
+An AI agent that analyzes tabular datasets, generates natural-language insights,
+**critiques its own output**, and stores what worked in persistent memory —
+so it gets measurably better at analysis with every dataset it sees.
 
-## Progress
+> Most "AI agent" projects are a thin wrapper around an LLM call. This one has
+> a real feedback loop: **Act → Self-critique → Store lesson → Retrieve lesson
+> next time** — and it tracks its own improvement over time as a chart, not
+> just a claim.
 
-- [x] **Step 1: Static Analysis MVP** (`agent/profiler.py`) — pure pandas/numpy/scipy
-      EDA profiler. No AI yet. Outputs a structured JSON profile: dtypes, missing
-      values, duplicates, numeric stats + skew + outliers, categorical cardinality,
-      and notable correlations.
-- [ ] Step 2: LLM insight layer
-- [ ] Step 3: Self-critique / scoring
-- [ ] Step 4: Persistent memory (ChromaDB)
-- [ ] Step 5: Metrics dashboard
-- [ ] Step 6: Streamlit UI
-- [ ] Step 7: Deploy to Streamlit Community Cloud
-- [ ] Step 8: Write-up
+🔗 **Live demo:** _coming soon_
+📊 **Portfolio write-up:** _coming soon_
 
-## Setup
+---
+
+## Why this project exists
+
+I'm a Computer Engineering student aiming for data science / ML roles. Instead
+of another notebook full of `df.describe()`, I wanted a project that shows:
+
+- solid EDA/statistics fundamentals (not just prompt engineering)
+- an understanding of agentic loops and memory, not just single API calls
+- an actual measurable "learning" signal — a metric that improves over time
+- something deployed and clickable, not just code sitting in a repo
+
+## How it works
+
+```
+ ┌─────────────┐     ┌──────────────┐     ┌───────────────┐
+ │  Upload CSV │ --> │   Profiler   │ --> │ LLM Insight    │
+ │             │     │ (pandas/numpy│     │ Generator      │
+ └─────────────┘     │  stats only) │     └───────┬───────┘
+                      └──────────────┘             │
+                                                    v
+ ┌─────────────┐     ┌──────────────┐     ┌───────────────┐
+ │   Metrics   │ <-- │   Memory     │ <-- │ Self-Critique  │
+ │  Dashboard  │     │  (ChromaDB)  │     │  (LLM judge)   │
+ └─────────────┘     └──────────────┘     └───────────────┘
+```
+
+1. **Profiler** — pure pandas/numpy/scipy pass over the dataset: dtypes, missing
+   values, duplicates, distribution shape, outliers (IQR method), and notable
+   correlations. No AI involved yet — this is the statistical ground truth.
+2. **Insight Generator** — an LLM turns the raw stats profile into plain-English
+   insights a human analyst would actually say out loud.
+3. **Self-Critique** — a second LLM pass scores each insight for relevance,
+   correctness, and actionability, with a justification.
+4. **Memory** — every (dataset fingerprint → strategy → score) triple is stored
+   in a vector DB. Before analyzing a new dataset, the agent retrieves similar
+   past attempts and adjusts its approach.
+5. **Metrics Dashboard** — logs every run and plots insight-quality over time —
+   the core proof-of-learning artifact of the whole project.
+
+## Project status
+
+| Step | Status |
+|---|---|
+| Static analysis / EDA profiler | ✅ Done |
+| LLM insight generation layer | ✅ Done |
+| Self-critique / scoring | 🔲 Planned |
+| Persistent memory (ChromaDB) | 🔲 Planned |
+| Metrics dashboard | 🔲 Planned |
+| Streamlit UI | 🔲 Planned |
+| Deployment (Streamlit Community Cloud) | 🔲 Planned |
+
+## Tech stack
+
+- **Analysis:** Python, Pandas, NumPy, SciPy
+- **Agent reasoning:** LLM API (Claude/OpenAI)
+- **Memory:** ChromaDB
+- **Metrics storage:** SQLite
+- **Frontend:** Streamlit
+- **Deployment:** Streamlit Community Cloud
+- **Testing:** Pytest
+
+## Getting started
 
 ```bash
+git clone https://github.com/<your-username>/selflearning-agent.git
+cd selflearning-agent
 pip install -r requirements.txt
 ```
 
-## Usage (current)
+Run the profiler on the built-in sample dataset:
 
 ```bash
-python agent/profiler.py        # runs on a built-in sample dataset
-python -m pytest tests/ -v      # run the test suite
+python agent/profiler.py
 ```
 
-## Why this project
+Run it on your own CSV (from a Python shell or script):
 
-Most "AI agent" portfolio projects are thin wrappers around an LLM API call.
-This one is different: it has a genuine self-improvement loop. The agent scores
-its own output quality, stores what worked in persistent memory, and retrieves
-relevant past lessons before analyzing a new dataset — producing a measurable
-quality-over-time trend, which is the core artifact of the whole project.
+```python
+import pandas as pd
+from agent.profiler import profile_dataset
+
+df = pd.read_csv("your_dataset.csv")
+profile = profile_dataset(df)
+print(profile)
+```
+
+Run the test suite:
+
+```bash
+python -m pytest tests/ -v
+```
+
+## Project structure
+
+```
+selflearning-agent/
+├── agent/
+│   ├── profiler.py            # static EDA analysis (no AI) — done
+│   └── insight_generator.py   # LLM turns stats into narrative insights — done
+├── tests/
+│   ├── test_profiler.py
+│   └── test_insight_generator.py
+├── requirements.txt
+└── README.md
+```
+
+## Environment variables
+
+Create a `.env` file or export directly:
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+```
+
+Then run the full pipeline:
+
+```bash
+cd agent
+python insight_generator.py
+```
+
+## Roadmap
+
+- [ ] Wire in an LLM to turn stats into narrative insights
+- [ ] Add a self-scoring rubric (relevance / correctness / actionability)
+- [ ] Add ChromaDB memory so lessons persist across datasets
+- [ ] Build the quality-over-time metrics dashboard
+- [ ] Ship a Streamlit UI
+- [ ] Deploy publicly and link the live demo here
+
+## License
+
+MIT
