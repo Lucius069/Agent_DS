@@ -57,7 +57,7 @@ of another notebook full of `df.describe()`, I wanted a project that shows:
 | Step | Status |
 |---|---|
 | Static analysis / EDA profiler | ✅ Done |
-| LLM insight generation layer | 🔲 Planned |
+| LLM insight generation layer | ✅ Done |
 | Self-critique / scoring | 🔲 Planned |
 | Persistent memory (ChromaDB) | 🔲 Planned |
 | Metrics dashboard | 🔲 Planned |
@@ -110,11 +110,28 @@ python -m pytest tests/ -v
 ```
 selflearning-agent/
 ├── agent/
-│   └── profiler.py       # static EDA analysis (no AI) — done
+│   ├── profiler.py            # static EDA analysis (no AI) — done
+│   └── insight_generator.py   # LLM turns stats into narrative insights — done
 ├── tests/
-│   └── test_profiler.py  # unit tests for the profiler
+│   ├── test_profiler.py
+│   └── test_insight_generator.py
 ├── requirements.txt
 └── README.md
+```
+
+## Environment variables
+
+Create a `.env` file or export directly:
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+```
+
+Then run the full pipeline:
+
+```bash
+cd agent
+python insight_generator.py
 ```
 
 ## Roadmap
